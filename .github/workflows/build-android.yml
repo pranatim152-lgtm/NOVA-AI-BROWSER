@@ -27,32 +27,28 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
-        with:
-          accept-android-sdk-licenses: 'true'
-          log-accepted-android-sdk-licenses: 'false'
 
-      - name: Set up Gradle
+      - name: Set up Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
       - name: Verify Android project
         run: |
-          if [ ! -f android/settings.gradle ] && [ ! -f android/settings.gradle.kts ]; then
-            echo "ERROR: Android Gradle project not found in android/ folder."
-            echo "Please check the repository structure."
-            exit 1
-          fi
+          test -f settings.gradle
+          test -f build.gradle
+          test -f app/build.gradle
+          test -f app/src/main/AndroidManifest.xml
+          test -f app/src/main/java/com/nova/browser/MainActivity.java
 
       - name: Build Debug APK
-        working-directory: android
         run: gradle assembleDebug
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: NOVA-Android-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
           
